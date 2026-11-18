@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101412">
+  <meta name="description" content="Open Greatij Bekoe's portfolio website and learn how to run it locally.">
+  <title>Website &amp; Run Instructions — Greatij Bekoe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f1f0e9;
+      --muted: #a4aaa2;
+      --surface: #181e1a;
+      --surface-raised: #202722;
+      --line: rgba(235, 239, 227, .12);
+      --accent: #c5f36b;
+      --page: #101412;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: radial-gradient(ellipse at 82% 4%, rgba(108, 143, 82, .13), transparent 31rem), var(--page);
+      color: var(--ink);
+      font: 16px/1.65 var(--sans);
+    }
+    a { color: inherit; }
+    .shell { width: min(820px, calc(100% - 3rem)); margin: 0 auto; }
+    header { border-bottom: 1px solid var(--line); background: rgba(16, 20, 18, .86); }
+    nav { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 1rem; }
+    .wordmark { color: var(--ink); font-size: .88rem; font-weight: 720; text-decoration: none; }
+    .back-link { color: var(--muted); font-size: .82rem; text-decoration: none; }
+    .back-link:hover { color: var(--accent); }
+    main { padding: clamp(4rem, 10vw, 7rem) 0; }
+    .eyebrow, h1, h2, p { margin-top: 0; }
+    .eyebrow { margin-bottom: 1rem; color: var(--accent); font-size: .72rem; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin-bottom: 1rem; font-size: clamp(2.7rem, 8vw, 5rem); font-weight: 550; letter-spacing: -.075em; line-height: 1; }
+    .intro { max-width: 610px; margin-bottom: 2rem; color: #c1c6be; }
+    .panel { margin-top: 1rem; padding: clamp(1.3rem, 5vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); }
+    h2 { margin-bottom: .6rem; font-size: 1.15rem; letter-spacing: -.025em; }
+    .panel p, ol { margin-bottom: 0; color: var(--muted); font-size: .9rem; }
+    .site-url { display: inline-block; margin-top: .5rem; color: var(--accent); font-weight: 650; overflow-wrap: anywhere; }
+    ol { padding-left: 1.25rem; }
+    li + li { margin-top: .55rem; }
+    code { padding: .15rem .4rem; border-radius: .35rem; background: var(--surface-raised); color: var(--ink); font-size: .88em; overflow-wrap: anywhere; }
+    .button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1rem;
+      padding: .7rem 1.05rem;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--accent);
+      color: #101412;
+      font-size: .82rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    @media (max-width: 480px) {
+      .shell { width: calc(100% - 2rem); }
+      nav { min-height: 64px; }
+      .wordmark { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="shell" aria-label="Main navigation">
+      <a class="wordmark" href="website-cv.html">GREATIJ BEKOE</a>
+      <a class="back-link" href="website-cv.html">Back to portfolio</a>
+    </nav>
+  </header>
+  <main class="shell">
+    <p class="eyebrow">Portfolio website</p>
+    <h1>Website &amp; run instructions</h1>
+    <p class="intro">This portfolio is a static website made with HTML, CSS, and JavaScript. It has no package installation or build step.</p>
+
+    <section class="panel" aria-labelledby="website-heading">
+      <h2 id="website-heading">Open the website</h2>
+      <p>The website file in this project is:</p>
+      <a class="site-url" href="website-cv.html">website-cv.html</a>
+      <p>There is no public hosting address configured in this project. After deployment, use the public URL provided by your hosting service.</p>
+      <a class="button" href="website-cv.html">View the portfolio</a>
+    </section>
+
+    <section class="panel" aria-labelledby="run-heading">
+      <h2 id="run-heading">Run it locally</h2>
+      <ol>
+        <li>Open this project folder in VS Code.</li>
+        <li>In the VS Code terminal, run <code>python3 -m http.server 8000</code>.</li>
+        <li>Open <code>http://localhost:8000/</code> in your browser. The home page will take you straight to the portfolio.</li>
+        <li>To stop the local server, return to the terminal and press <code>Ctrl+C</code>.</li>
+      </ol>
+      <p>If Python is unavailable, open <code>website-cv.html</code> directly in your browser, or use the VS Code Live Server extension.</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101412">
+  <meta name="description" content="A tiny endless runner about waiting for a very long load.">
+  <title>Still Loading — Endless Runner</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f1f0e9;
+      --muted: #a4aaa2;
+      --surface: #181e1a;
+      --line: rgba(235, 239, 227, .13);
+      --accent: #c5f36b;
+      --page: #101412;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 50% 0, rgba(89, 122, 76, .2), transparent 38rem),
+        var(--page);
+      color: var(--ink);
+      font: 16px/1.6 var(--sans);
+    }
+    .shell { width: min(1050px, calc(100% - 2rem)); margin: 0 auto; }
+    header { border-bottom: 1px solid var(--line); }
+    .topbar { display: flex; min-height: 70px; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; color: var(--ink); font-size: .82rem; font-weight: 750; letter-spacing: .08em; text-decoration: none; }
+    .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: var(--accent); color: var(--page); }
+    .top-note { color: var(--muted); font-size: .75rem; }
+    main { padding: clamp(2.5rem, 7vw, 5rem) 0 3rem; }
+    .intro { margin-bottom: 1.6rem; text-align: center; }
+    .eyebrow { margin: 0 0 .65rem; color: var(--accent); font-size: .68rem; font-weight: 750; letter-spacing: .17em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.5rem, 7vw, 4.6rem); font-weight: 560; letter-spacing: -.075em; line-height: 1.02; }
+    .intro-copy { max-width: 580px; margin: .85rem auto 0; color: var(--muted); font-size: .9rem; }
+    .game-frame { overflow: hidden; border: 1px solid var(--line); border-radius: 1.1rem; background: #111915; box-shadow: 0 24px 80px rgba(0, 0, 0, .28); }
+    canvas { display: block; width: 100%; height: auto; aspect-ratio: 960 / 540; touch-action: manipulation; }
+    .game-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.15rem; border-top: 1px solid var(--line); background: var(--surface); }
+    .scoreboard { display: flex; align-items: center; gap: 1.5rem; }
+    .score-label { display: block; color: var(--muted); font-size: .64rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .score-value { color: var(--accent); font-size: 1.25rem; font-variant-numeric: tabular-nums; font-weight: 750; }
+    .score-best .score-value { color: var(--ink); }
+    .play-button {
+      min-height: 42px;
+      padding: .6rem 1.1rem;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--page);
+      cursor: pointer;
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 750;
+    }
+    .play-button:hover { background: #d3ff80; }
+    .play-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    .instructions { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem 1.4rem; margin: 1.1rem 0 0; color: var(--muted); font-size: .75rem; text-align: center; }
+    .instructions strong { color: #dce1d7; font-weight: 650; }
+    .status { min-height: 1.5em; margin: .55rem 0 0; color: var(--accent); font-size: .75rem; text-align: center; }
+    .run-help { max-width: 650px; margin: 2rem auto 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: .75rem; background: rgba(24,30,26,.7); color: var(--muted); font-size: .78rem; }
+    .run-help summary { color: #dce1d7; cursor: pointer; font-weight: 650; }
+    .run-help p { margin: .7rem 0 0; }
+    code { padding: .15rem .4rem; border-radius: .35rem; background: #202722; color: var(--ink); overflow-wrap: anywhere; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 1rem, 1050px); }
+      .topbar { min-height: 60px; }
+      .top-note { font-size: .66rem; }
+      .game-frame { border-radius: .75rem; }
+      .game-footer { padding: .8rem; }
+      .scoreboard { gap: .85rem; }
+      .score-value { font-size: 1.05rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell topbar">
+      <a class="brand" href="../Website/website-cv.html" aria-label="Back to Greatij Bekoe's portfolio"><span class="brand-mark" aria-hidden="true">GB</span> GREATIJ BEKOE</a>
+      <span class="top-note">A small game about a very long wait</span>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="intro" aria-labelledby="game-title">
+      <p class="eyebrow">Please keep your device on</p>
+      <h1 id="game-title">Still loading<span aria-hidden="true">…</span></h1>
+      <p class="intro-copy">The progress bar is going nowhere. At least the little cursor can keep moving. Jump over the blocks and see how long you last.</p>
+    </section>
+
+    <section class="game-frame" aria-label="Endless runner game">
+      <canvas id="game" width="960" height="540" aria-label="Game scene. Press Space or the up arrow to jump over blocks."></canvas>
+      <div class="game-footer">
+        <div class="scoreboard" aria-label="Game scores">
+          <div>
+            <span class="score-label">Current score</span>
+            <span class="score-value" id="score">00000</span>
+          </div>
+          <div class="score-best">
+            <span class="score-label">Best</span>
+            <span class="score-value" id="best-score">00000</span>
+          </div>
+        </div>
+        <button class="play-button" id="play" type="button">Start running</button>
+      </div>
+    </section>
+    <p class="instructions"><span><strong>Space</strong> or <strong>↑</strong> to jump</span><span>Tap or click to jump</span><span>Air time is under one second</span></p>
+    <p class="status" id="status" role="status" aria-live="polite">Ready when you are.</p>
+    <details class="run-help">
+      <summary>How to run this game from a terminal</summary>
+      <p>From the project root folder, run <code>python3 -m http.server 8001 --directory Game</code>, then open <code>http://localhost:8001/</code> in your browser. Press <code>Ctrl+C</code> in the terminal to stop the server.</p>
+    </details>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const context = canvas.getContext("2d");
+    const scoreElement = document.getElementById("score");
+    const bestScoreElement = document.getElementById("best-score");
+    const statusElement = document.getElementById("status");
+    const playButton = document.getElementById("play");
+
+    const SCORE_STORAGE_KEY = "stillLoadingBestScore";
+    const WORLD_WIDTH = 960;
+    const WORLD_HEIGHT = 540;
+    const GROUND_Y = 420;
+    const PLAYER_X = 148;
+    const PLAYER_WIDTH = 38;
+    const PLAYER_HEIGHT = 50;
+    const JUMP_DURATION_MS = 820;
+    const stars = Array.from({ length: 74 }, (_, index) => ({
+      x: (index * 137 + 41) % WORLD_WIDTH,
+      y: 28 + (index * 67) % 260,
+      radius: index % 8 === 0 ? 1.7 : .8,
+      phase: index * .71
+    }));
+
+    let state = "ready";
+    let frameTime = 0;
+    let distance = 0;
+    let bestScore = 0;
+    let statusMessage = "Ready when you are.";
+    let storageWarning = "";
+    let speed = 330;
+    let spawnTimer = 1.25;
+    let jumpElapsed = JUMP_DURATION_MS;
+    let obstacles = [];
+    let animationFrame = 0;
+
+    function setStatus(message) {
+      statusMessage = message;
+      statusElement.textContent = storageWarning ? `${message} ${storageWarning}` : message;
+    }
+
+    function loadBestScore() {
+      try {
+        const savedScore = window.localStorage.getItem(SCORE_STORAGE_KEY);
+        if (savedScore === null) return 0;
+        const parsedScore = Number(savedScore);
+        if (Number.isSafeInteger(parsedScore) && parsedScore >= 0) return parsedScore;
+        storageWarning = "Saved best score was invalid and has been reset.";
+      } catch {
+        storageWarning = "Best score storage is unavailable in this browser.";
+      }
+      return 0;
+    }
+
+    function saveBestScore(score) {
+      try {
+        window.localStorage.setItem(SCORE_STORAGE_KEY, String(score));
+      } catch {
+        storageWarning = "Best score could not be saved in this browser.";
+        setStatus(statusMessage);
+      }
+    }
+
+    function updateBestScore(score) {
+      if (score <= bestScore) return;
+      bestScore = score;
+      bestScoreElement.textContent = String(bestScore).padStart(5, "0");
+      saveBestScore(bestScore);
+    }
+
+    function resizeCanvas() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = WORLD_WIDTH * pixelRatio;
+      canvas.height = WORLD_HEIGHT * pixelRatio;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      draw();
+    }
+
+    function resetGame() {
+      distance = 0;
+      speed = 330;
+      spawnTimer = 1.15;
+      jumpElapsed = JUMP_DURATION_MS;
+      obstacles = [];
+      scoreElement.textContent = "00000";
+    }
+
+    function startGame() {
+      resetGame();
+      state = "running";
+      frameTime = 0;
+      playButton.textContent = "Jump";
+      setStatus("Running. Jump over the blocks!");
+    }
+
+    function endGame() {
+      state = "over";
+      playButton.textContent = "Try again";
+      setStatus(`Loading interrupted at ${Math.floor(distance / 10)} metres. Try again?`);
+    }
+
+    function jump() {
+      if (state !== "running" || jumpElapsed < JUMP_DURATION_MS) return;
+      jumpElapsed = 0;
+    }
+
+    function handleAction() {
+      if (state === "ready" || state === "over") {
+        startGame();
+      } else {
+        jump();
+      }
+    }
+
+    function addObstacle() {
+      const blockCount = Math.random() < .58 ? 1 : 2;
+      obstacles.push({
+        x: WORLD_WIDTH + 30,
+        count: blockCount,
+        width: blockCount * 38 + (blockCount - 1) * 5,
+        height: 34 + Math.random() * 14
+      });
+      spawnTimer = (560 + Math.random() * 240) / speed;
+    }
+
+    function update(deltaSeconds) {
+      if (state !== "running") return;
+      distance += speed * deltaSeconds;
+      speed = Math.min(520, speed + 7 * deltaSeconds);
+      spawnTimer -= deltaSeconds;
+      if (spawnTimer <= 0) addObstacle();
+
+      if (jumpElapsed < JUMP_DURATION_MS) {
+        jumpElapsed = Math.min(JUMP_DURATION_MS, jumpElapsed + deltaSeconds * 1000);
+      }
+
+      obstacles.forEach((obstacle) => {
+        obstacle.x -= speed * deltaSeconds;
+      });
+      obstacles = obstacles.filter((obstacle) => obstacle.x + obstacle.width > -10);
+      const currentScore = Math.floor(distance / 10);
+      scoreElement.textContent = String(currentScore).padStart(5, "0");
+      updateBestScore(currentScore);
+
+      const jumpProgress = jumpElapsed / JUMP_DURATION_MS;
+      const playerY = GROUND_Y - PLAYER_HEIGHT - Math.sin(Math.PI * jumpProgress) * 126;
+      for (const obstacle of obstacles) {
+        const overlapsX = PLAYER_X + PLAYER_WIDTH - 7 > obstacle.x + 3
+          && PLAYER_X + 7 < obstacle.x + obstacle.width - 3;
+        const clearsObstacle = playerY + PLAYER_HEIGHT - 5 <= GROUND_Y - obstacle.height;
+        if (overlapsX && !clearsObstacle) {
+          endGame();
+          break;
+        }
+      }
+    }
+
+    function roundedRect(x, y, width, height, radius) {
+      context.beginPath();
+      context.roundRect(x, y, width, height, radius);
+    }
+
+    function drawBackground(time) {
+      const sky = context.createLinearGradient(0, 0, 0, WORLD_HEIGHT);
+      sky.addColorStop(0, "#14221e");
+      sky.addColorStop(.58, "#202e28");
+      sky.addColorStop(1, "#29352b");
+      context.fillStyle = sky;
+      context.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+      const glow = context.createRadialGradient(690, 180, 8, 690, 180, 300);
+      glow.addColorStop(0, "rgba(197,243,107,.14)");
+      glow.addColorStop(1, "rgba(197,243,107,0)");
+      context.fillStyle = glow;
+      context.fillRect(350, 0, 610, 430);
+
+      stars.forEach((star) => {
+        context.globalAlpha = .3 + (Math.sin(time * .001 + star.phase) + 1) * .19;
+        context.fillStyle = "#e5efd5";
+        context.beginPath();
+        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        context.fill();
+      });
+      context.globalAlpha = 1;
+
+      context.fillStyle = "#1b2923";
+      context.beginPath();
+      context.moveTo(0, 350);
+      for (let x = 0; x <= WORLD_WIDTH; x += 80) {
+        context.lineTo(x, 330 + Math.sin(x * .012) * 18 + Math.sin(x * .027) * 9);
+      }
+      context.lineTo(WORLD_WIDTH, GROUND_Y);
+      context.lineTo(0, GROUND_Y);
+      context.closePath();
+      context.fill();
+
+      context.fillStyle = "#222f27";
+      context.beginPath();
+      context.moveTo(0, 390);
+      for (let x = 0; x <= WORLD_WIDTH; x += 60) {
+        context.lineTo(x, 382 + Math.sin(x * .009 + 2) * 11 + Math.sin(x * .021) * 6);
+      }
+      context.lineTo(WORLD_WIDTH, GROUND_Y);
+      context.lineTo(0, GROUND_Y);
+      context.closePath();
+      context.fill();
+
+      context.fillStyle = "#111915";
+      context.fillRect(0, GROUND_Y, WORLD_WIDTH, WORLD_HEIGHT - GROUND_Y);
+      context.fillStyle = "rgba(197,243,107,.72)";
+      context.fillRect(0, GROUND_Y, WORLD_WIDTH, 2);
+
+      const offset = (distance * .55) % 54;
+      context.strokeStyle = "rgba(197,243,107,.07)";
+      context.lineWidth = 1;
+      for (let x = -offset; x < WORLD_WIDTH + 54; x += 54) {
+        context.beginPath();
+        context.moveTo(x, GROUND_Y + 2);
+        context.lineTo(x - 90, WORLD_HEIGHT);
+        context.stroke();
+      }
+      context.strokeStyle = "rgba(197,243,107,.05)";
+      for (let y = GROUND_Y + 22; y < WORLD_HEIGHT; y += 24) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(WORLD_WIDTH, y);
+        context.stroke();
+      }
+    }
+
+    function drawLoadingPanel() {
+      const panelX = 46;
+      const panelY = 44;
+      context.fillStyle = "rgba(12,18,15,.55)";
+      roundedRect(panelX, panelY, 250, 72, 12);
+      context.fill();
+      context.fillStyle = "#a4aaa2";
+      context.font = "600 11px " + getComputedStyle(document.body).fontFamily;
+      context.letterSpacing = "1.5px";
+      context.fillText("SYSTEM UPDATE", panelX + 16, panelY + 23);
+      context.letterSpacing = "0px";
+      context.fillStyle = "#f1f0e9";
+      context.font = "600 14px " + getComputedStyle(document.body).fontFamily;
+      context.fillText("Please wait patiently", panelX + 16, panelY + 45);
+
+      const loadPercent = Math.floor(distance / 45) % 100;
+      const barX = panelX + 16;
+      const barY = panelY + 55;
+      const barWidth = 216;
+      context.fillStyle = "rgba(255,255,255,.13)";
+      roundedRect(barX, barY, barWidth, 5, 3);
+      context.fill();
+      context.fillStyle = "#c5f36b";
+      roundedRect(barX, barY, Math.max(5, barWidth * loadPercent / 100), 5, 3);
+      context.fill();
+
+      context.fillStyle = "rgba(241,240,233,.55)";
+      context.font = "600 12px " + getComputedStyle(document.body).fontFamily;
+      context.textAlign = "right";
+      context.fillText(`${loadPercent}%`, WORLD_WIDTH - 46, 67);
+      context.textAlign = "left";
+    }
+
+    function drawPlayer(time) {
+      const progress = Math.min(1, jumpElapsed / JUMP_DURATION_MS);
+      const lift = jumpElapsed < JUMP_DURATION_MS ? Math.sin(Math.PI * progress) * 126 : 0;
+      const x = PLAYER_X;
+      const y = GROUND_Y - PLAYER_HEIGHT - lift;
+
+      context.fillStyle = `rgba(0,0,0,${.22 - lift / 900})`;
+      context.beginPath();
+      context.ellipse(x + PLAYER_WIDTH / 2, GROUND_Y + 6, Math.max(11, 23 - lift / 9), 5, 0, 0, Math.PI * 2);
+      context.fill();
+
+      context.fillStyle = "#c5f36b";
+      roundedRect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT, 9);
+      context.fill();
+      context.fillStyle = "#263522";
+      roundedRect(x + 7, y + 10, 24, 17, 5);
+      context.fill();
+      context.fillStyle = "#c5f36b";
+      context.fillRect(x + 11, y + 17, 4, 4);
+      context.fillRect(x + 23, y + 17, 4, 4);
+
+      const footOffset = state === "running" && lift < 5 ? Math.sin(time * .02) * 4 : 0;
+      context.fillStyle = "#9dc54e";
+      roundedRect(x + 4, y + PLAYER_HEIGHT - 5 + footOffset, 13, 9, 3);
+      context.fill();
+      roundedRect(x + 22, y + PLAYER_HEIGHT - 5 - footOffset, 13, 9, 3);
+      context.fill();
+    }
+
+    function drawObstacles() {
+      obstacles.forEach((obstacle) => {
+        for (let index = 0; index < obstacle.count; index += 1) {
+          const x = obstacle.x + index * 43;
+          const y = GROUND_Y - obstacle.height;
+          context.fillStyle = "#769653";
+          roundedRect(x, y, 38, obstacle.height, 5);
+          context.fill();
+          context.fillStyle = "rgba(255,255,255,.13)";
+          context.fillRect(x + 5, y + 5, 28, 3);
+          context.fillStyle = "rgba(16,20,18,.28)";
+          context.fillRect(x + 7, y + 13, 4, 4);
+          context.fillRect(x + 18, y + 13, 4, 4);
+          context.fillRect(x + 29, y + 13, 3, 4);
+        }
+      });
+    }
+
+    function drawOverlay() {
+      if (state === "running") return;
+      context.fillStyle = "rgba(8,13,10,.5)";
+      context.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+      context.textAlign = "center";
+      context.fillStyle = "#f1f0e9";
+      context.font = "650 27px " + getComputedStyle(document.body).fontFamily;
+      context.fillText(state === "ready" ? "The wait is endless." : "Connection lost.", WORLD_WIDTH / 2, 255);
+      context.fillStyle = "#c5f36b";
+      context.font = "500 15px " + getComputedStyle(document.body).fontFamily;
+      context.fillText(state === "ready" ? "Press Start or jump to begin" : "Press Try again to reload", WORLD_WIDTH / 2, 285);
+      context.textAlign = "left";
+    }
+
+    function draw(time = 0) {
+      context.clearRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+      drawBackground(time);
+      drawLoadingPanel();
+      drawObstacles();
+      drawPlayer(time);
+      drawOverlay();
+    }
+
+    function frame(time) {
+      const deltaSeconds = frameTime ? Math.min((time - frameTime) / 1000, .04) : 0;
+      frameTime = time;
+      update(deltaSeconds);
+      draw(time);
+      animationFrame = window.requestAnimationFrame(frame);
+    }
+
+    playButton.addEventListener("click", handleAction);
+    canvas.addEventListener("pointerdown", () => {
+      if (state === "ready" || state === "over") startGame();
+      else jump();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.target instanceof HTMLElement && event.target.closest("button")) return;
+      if (event.code === "Space" || event.code === "ArrowUp") {
+        event.preventDefault();
+        if (state === "ready" || state === "over") startGame();
+        else jump();
+      }
+    });
+    window.addEventListener("resize", resizeCanvas);
+
+    bestScore = loadBestScore();
+    bestScoreElement.textContent = String(bestScore).padStart(5, "0");
+    setStatus("Ready when you are.");
+    resizeCanvas();
+    animationFrame = window.requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

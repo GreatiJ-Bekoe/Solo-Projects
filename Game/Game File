@@ -1,0 +1,7 @@
+This game is a similar gaming concept to the computer loading game that goes on forever that generates a block of one or two that can be jumped over by the charachter with a maximum 1 second air time with beautiful background that matches the aesthetic
+
+Run the game locally:
+1. Open the project root (the folder containing the Game folder) in a terminal.
+2. Run: python3 -m http.server 8001 --directory Game
+3. Open http://localhost:8001/ in a browser.
+4. Press Ctrl+C in the terminal to stop the server.
